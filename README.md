@@ -1,4 +1,4 @@
-# englandrugby-gms-tools
+# englandrugby-gms-parser
 
 Library to extract and parse data from England Rugby GMS extracts in CVS format.  Currently supports people and membership extracts.
 

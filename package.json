@@ -1,6 +1,6 @@
 {
-  "name": "englandrugby-gms-tools",
-  "version": "0.0.4",
+  "name": "englandrugby-gms-parser",
+  "version": "0.0.1",
   "description": "Typescript library for parsing England Rugby GMS exports in CSV format",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
