@@ -1,3 +1,5 @@
+import { Utils } from './Utils';
+
 export declare interface MembershipCSVData { [name: string]: string; };
 
 export const M_CLUB = 'Club';
@@ -71,15 +73,15 @@ export class Membership {
         if (undefined !== data[M_CLUB]) this.club = data[M_CLUB];
         if (undefined !== data[M_MEMTYPE]) this.memType = data[M_MEMTYPE];
         if (undefined !== data[M_MEMSCHEME]) this.scheme = data[M_MEMSCHEME];
-        if (undefined !== data[M_MEMSTARTDATE]) this.startDate = new Date(data[M_MEMSTARTDATE]);
-        if (undefined !== data[M_MEMVALIDTO]) this.validTo = new Date(data[M_MEMVALIDTO]);
+        if (undefined !== data[M_MEMSTARTDATE]) this.startDate = Utils.dateFromUKString(data[M_MEMSTARTDATE]);
+        if (undefined !== data[M_MEMVALIDTO]) this.validTo = Utils.dateFromUKString(data[M_MEMVALIDTO]);
         if (undefined !== data[M_ORDERSTATUS]) this.orderStatus = data[M_ORDERSTATUS];
         if (undefined !== data[M_ORDERNUMBER]) this.orderNumber = data[M_ORDERNUMBER];
         if (undefined !== data[M_BALANCE]) this.balance = parseFloat(data[M_BALANCE]);
         if (undefined !== data[M_MEMSTATUS]) this.status = data[M_MEMSTATUS];
         if (undefined !== data[M_MEMSTATUSREASON]) this.statusReason = data[M_MEMSTATUSREASON];
-        if (undefined !== data[M_MEMRENEWALDATE]) this.renewalDate = new Date(data[M_MEMRENEWALDATE]);
-        if (undefined !== data[M_UPDATEDATE]) this.updateDate = new Date(data[M_UPDATEDATE]);
+        if (undefined !== data[M_MEMRENEWALDATE]) this.renewalDate = Utils.dateFromUKString(data[M_MEMRENEWALDATE]);
+        if (undefined !== data[M_UPDATEDATE]) this.updateDate = Utils.dateFromUKString(data[M_UPDATEDATE]);
         if (undefined !== data[M_UPDATEDBY]) this.updateBy = data[M_UPDATEDBY];
     }
 
