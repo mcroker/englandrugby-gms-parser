@@ -1,0 +1,23 @@
+# package directories
+node_modules
+
+# Build directory
+.build
+.webpack
+.tscache
+*.tmp.txt
+dist/
+.scannerwork
+
+# Reports
+reports
+.nyc_output
+
+# Mac dirs
+.DS_Store
+
+# Temporary files
+.offline.pid
+
+# Data
+./data

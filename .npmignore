@@ -1,0 +1,26 @@
+.npmignore
+
+# Sourcecode
+src/
+
+# Test/Development artefacts
+*.spec.*
+**/test
+
+# Dev config files
+tsconfig.json
+tslint.json
+
+# Build / temp directory
+.build
+.tscache
+*.tmp.txt
+.offline.pid
+.scannerwork
+
+# Reports
+reports/
+.nyc_output
+
+# Data
+./data
