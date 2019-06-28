@@ -2,7 +2,7 @@ export declare interface PersonCSVData { [name: string]: string; };
 import { Address } from './Address';
 import { Relationship } from './Relationship';
 import { Utils } from './Utils';
-import { Qualifcation, Qualifcations } from './Qualifcation';
+import { Qualifcation, Qualifcations } from './Qualification';
 import { Role } from './Role';
 
 export const P_TITLE = 'Title';

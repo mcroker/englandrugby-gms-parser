@@ -5,7 +5,7 @@ import { Membership } from './Membership';
 import { Person } from './Person';
 import { Family } from './Family';
 import { Role } from './Role';
-import { Qualifcation, QualifcationTypes } from './Qualifcation';
+import { Qualifcation, QualifcationTypes } from './Qualification';
 
 export class ClubGMS {
 
