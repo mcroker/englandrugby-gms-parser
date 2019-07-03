@@ -7,8 +7,12 @@ export class Utils {
         let month = p[1];
         let day = p[0];
         if (undefined !== year && undefined !== month && undefined !== day) {
-            let utcString = p[2] + '-' + p[1] + '-' + p[0];
-            return new Date(utcString);
+            let date = new Date(p[2] + '-' + p[1] + '-' + p[0]);
+            if (0 !== date.getTime()) {
+                return date;
+            } else {
+                return undefined;
+            }
         } else {
             return undefined;
         }

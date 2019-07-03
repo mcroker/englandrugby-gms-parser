@@ -1,8 +1,8 @@
 export declare interface PersonCSVData { [name: string]: string; };
 import { Address } from './Address';
-import { Relationship } from './Relationship';
+import { Relationship, RelationshipType as RelType } from './Relationship';
 import { Utils } from './Utils';
-import { Qualifcation, Qualifcations } from './Qualification';
+import { Qualifcation, QualificationType } from './Qualification';
 import { Role } from './Role';
 
 export const P_TITLE = 'Title';
@@ -103,8 +103,8 @@ export class Person {
     relationshipText: string = '';
     relationships: Relationship[] = [];
     externalRef: string = '';
-    hasDPAFlag1: boolean | undefined = undefined;
-    hasDPAFlag2: boolean | undefined = undefined;
+    hasDPAFlag1: boolean = true; // Assume maximum DBA if not set
+    hasDPAFlag2: boolean = true; // Assume maximum DBA if not set
     interests: string = '';
     customTag: string = '';
     dataAssocated: Date | undefined = undefined;
@@ -114,10 +114,59 @@ export class Person {
     occupation: string = '';
     memberships: Membership[] = [];
 
+    // TODO - getContactPhones()
+
     public constructor(data?: PersonCSVData) {
         if (undefined !== data) {
             this.importPersonCSV(data)
         }
+    }
+
+    public getParents(includeParentsOfAdults = false): Person[] {
+        if (includeParentsOfAdults || this.isChild()) {
+            return this.relationships.filter((item: Relationship) => {
+                return ((item.relType === RelType.childOf || item.relType === RelType.chargeOf) && undefined !== item.relation)
+            }).map((rel: Relationship) => {
+                if (undefined !== rel.relation) {
+                    return rel.relation
+                } else {
+                    throw (new Error('rel.relation shouldn\'t ever be null'));
+                }
+            });
+        } else {
+            return [];
+        }
+    }
+
+    public getChildren(includeAdultChildren = false): Person[] {
+        return this.relationships.filter((item: Relationship) => {
+            return (
+                (item.relType === RelType.parentOf || item.relType === RelType.guardianOf) &&
+                undefined !== item.relation &&
+                (includeAdultChildren || item.relation.isChild())
+                )
+        }).map((rel: Relationship) => {
+            if (undefined !== rel.relation) {
+                return rel.relation
+            } else {
+                throw (new Error('rel.relation shouldn\'t ever be null'));
+            }
+        });
+    }
+
+    public getContactEmails(): string[] {
+        let contactEmails: Set<string> = new Set<string>();
+        if (undefined !== this.email && '' !== this.email) {
+            contactEmails.add('"' + this.getName() + '" <' + this.email + '<');
+        }
+        if (this.isChild()) {
+            for (let parent of this.getParents()) {
+                if (undefined !== parent.email && '' !== parent.email) {
+                    contactEmails.add('"' + parent.getName() + '" <' + parent.email + '>');
+                }
+            }
+        }
+        return Array.from(contactEmails.values());
     }
 
     public importPersonCSV(data: PersonCSVData) {
@@ -233,9 +282,15 @@ export class Person {
         }));
     }
 
-    hasQualifcation(qualifcation: RegExp | string | Qualifcations): boolean {
+    hasQualifcation(qualifcation: RegExp | string): boolean {
         return (undefined !== this.qualifcations.find((item: Qualifcation) => {
-            return (item.name.match(qualifcation) || item.normalisedName.match(qualifcation));
+            return (item.name.match(qualifcation));
+        }));
+    }
+
+    hasQualifcationType(qualifcationType: QualificationType, minLevel = -1): boolean {
+        return (undefined !== this.qualifcations.find((item: Qualifcation) => {
+            return (item.type === qualifcationType && item.level >= minLevel);
         }));
     }
 

@@ -1,4 +1,5 @@
 import { Utils } from './Utils';
+import { Person } from './Person';
 
 export declare interface MembershipCSVData { [name: string]: string; };
 
@@ -58,12 +59,17 @@ export class Membership {
     statusReason: string = '';
     renewalDate: Date | undefined = undefined;
     updateDate: Date | undefined  = undefined;
-    updateBy: string = ''
+    updateBy: string = '';
+    person: Person | undefined = undefined;
 
     public constructor(data?: MembershipCSVData) {
         if (undefined !== data) {
             this.loadFromCSV(data)
         }
+    }
+
+    public associatePerson(person: Person) {
+        this.person = person;
     }
 
     public loadFromCSV(data: MembershipCSVData) {

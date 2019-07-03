@@ -4,8 +4,8 @@ import { Membership } from './Membership';
 export type MembershipScoreFunction = (per: Person, mem: Membership) => number;
 
 export interface PrimaryData {
-  person?: Person;
-  membership?: Membership;
+    person?: Person;
+    membership?: Membership;
 }
 
 export class Family {
@@ -41,8 +41,8 @@ export class Family {
     }
 
     getPrimaryData(scoreFunc: MembershipScoreFunction): PrimaryData {
-        let primaryScheme : Membership | undefined = undefined;
-        let primaryPerson : Person | undefined = undefined;
+        let primaryScheme: Membership | undefined = undefined;
+        let primaryPerson: Person | undefined = undefined;
         let topScore = 0;
         let oldestPerson: Person | undefined = undefined;
         let firstDOB: Date | undefined = undefined;
@@ -51,7 +51,7 @@ export class Family {
                 oldestPerson = person;
                 firstDOB = person.DOB;
             }
-            for(let membership  of person.memberships) {
+            for (let membership of person.memberships) {
                 let score = scoreFunc(person, membership)
                 if (score > topScore) {
                     topScore = score;
@@ -84,6 +84,10 @@ export class Family {
         }
     }
 
+    hasActiveMember(): boolean {
+        return ((this.countAdults(true) + this.countChildren(true)) > 0);
+    }
+
     mergeFamily(family: Family) {
         this.adults = [... new Set(this.adults.concat(family.adults))];
         this.children = [... new Set(this.children.concat(family.children))];
@@ -92,40 +96,8 @@ export class Family {
     private static processAdult(person: Person, family: Family, people: Map<string, Person>): Family {
         if (!family.includes(person)) {
             family.addPerson(person);
-            for (var rel of person.relationships) {
-                if (undefined !== rel && undefined !== rel.rfuid) {
-                    let myrel = people.get(rel.rfuid);
-                    if (undefined !== myrel && !family.includesById(myrel.rfuid)) {
-                        switch (rel.relType) {
-
-                            case 'Parent':
-                            case 'Guardian':
-                            case 'Next':
-                                if (myrel.isChild()) {
-                                    // console.log('P ', person.getNameAndId(), ' =P=> ', myrel.getNameAndId());
-                                    family.mergeFamily(Family.processChild(myrel, family, people));
-                                }
-                                break;
-
-                            case 'Sibling':
-                            case 'Charge':
-                            case 'Child':
-                            case 'Grandchild':
-                            case 'Guardian':
-                            case 'Grandparent':
-                            case 'Other':
-                            case 'Next':
-                            case 'Wife':
-                            case 'Husband':
-                            case 'Partner':
-                            case 'Fiance':
-                                break;
-
-                            default:
-                                console.log('P*************** rel not recognised:' + rel.relType);
-                        }
-                    }
-                }
+            for (let child of person.getChildren()) {
+                family.mergeFamily(Family.processChild(child, family, people));
             }
         }
         return family;
@@ -134,42 +106,8 @@ export class Family {
     private static processChild(person: Person, family: Family, people: Map<string, Person>): Family {
         if (!family.includes(person)) {
             family.addPerson(person);
-            for (var rel of person.relationships) {
-                if (undefined !== rel && undefined !== rel.rfuid) {
-                    let myrel = people.get(rel.rfuid);
-                    if (undefined !== myrel && !family.includesById(myrel.rfuid)) {
-                        switch (rel.relType) {
-
-                            case 'Charge':
-                            case 'Child':
-                                // console.log('C ', person.getNameAndId(), ' =C=> ', myrel.getNameAndId());
-                                family.mergeFamily(Family.processAdult(myrel, family, people));
-                                break;
-
-                            case 'Sibling':
-                                if (myrel.isChild()) {
-                                    // console.log('S ', person.getNameAndId(), ' =S=> ', myrel.getNameAndId());
-                                    family.mergeFamily(Family.processChild(myrel, family, people));
-                                }
-                                break;
-
-                            case 'Parent':
-                            case 'Other':
-                            case 'Next':
-                            case 'Grandchild':
-                            case 'Grandparent':
-                            case 'Wife':
-                            case 'Husband':
-                            case 'Partner':
-                            case 'Fiance':
-                                break;
-
-
-                            default:
-                                console.log('K*************** rel not recognised:' + rel.relType);
-                        }
-                    }
-                }
+            for (let parent of person.getParents()) {
+                family.mergeFamily(Family.processAdult(parent, family, people));
             }
         }
         return family
