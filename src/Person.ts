@@ -157,7 +157,7 @@ export class Person {
     public getContactEmails(): string[] {
         let contactEmails: Set<string> = new Set<string>();
         if (undefined !== this.email && '' !== this.email) {
-            contactEmails.add('"' + this.getName() + '" <' + this.email + '<');
+            contactEmails.add('"' + this.getName() + '" <' + this.email + '>');
         }
         if (this.isChild()) {
             for (let parent of this.getParents()) {
