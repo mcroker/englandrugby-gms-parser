@@ -7,6 +7,7 @@ import { Family } from './Family';
 import { Role } from './Role';
 import { Qualifcation, QualificationType } from './Qualification';
 import { Scheme, SchemeNormaliseFunction } from './Scheme';
+import { AgeGrade } from './Team';
 
 export class ClubGMS {
 
@@ -112,6 +113,12 @@ export class ClubGMS {
 
   getPeople() {
     return Array.from(this.people.values());
+  }
+
+  findPeopleByAgeGrade(agegrade: AgeGrade): Person[] {
+    return Array.from(this.people.values()).filter((person: Person) => {
+      return (person.getAgeGrade() === agegrade)
+    })
   }
 
   findPersonById(rfuid: string): Person | undefined {

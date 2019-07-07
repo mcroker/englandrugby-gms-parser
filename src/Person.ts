@@ -1,9 +1,28 @@
 export declare interface PersonCSVData { [name: string]: string; };
+
+export enum Gender {
+    male = 'M',
+    female = 'F'
+};
+
+export interface GenderConfig {
+    titles: { [title: string]: Gender; },
+    names: { [name: string]: Gender; }
+};
+
+export interface SeasonConfig {
+    [season: string]: {
+        start: Date,
+        end: Date
+    };
+};
+
 import { Address } from './Address';
 import { Relationship, RelationshipType as RelType } from './Relationship';
 import { Utils } from './Utils';
 import { Qualifcation, QualificationType } from './Qualification';
 import { Role } from './Role';
+import { AgeGrade, AgeGradeConfig, DEFAULT_AGE_GRADE_CONFIG } from './Team';
 
 export const P_TITLE = 'Title';
 export const P_RFUID = 'RFU ID';
@@ -113,6 +132,7 @@ export class Person {
     disability: string = ''; // TODO is boolean?
     occupation: string = '';
     memberships: Membership[] = [];
+    gender: Gender | undefined = undefined;
 
     // TODO - getContactPhones()
 
@@ -144,7 +164,7 @@ export class Person {
                 (item.relType === RelType.parentOf || item.relType === RelType.guardianOf) &&
                 undefined !== item.relation &&
                 (includeAdultChildren || item.relation.isChild())
-                )
+            )
         }).map((rel: Relationship) => {
             if (undefined !== rel.relation) {
                 return rel.relation
@@ -302,6 +322,61 @@ export class Person {
     getNameAndId(): string {
         let firstname = ('' !== this.knownAs) ? this.knownAs : this.firstName;
         return firstname + ' ' + this.lastName + ' (' + this.rfuid + ')';
+    }
+
+    getInferredGender(): Gender {
+        // The PC person in me dislikes both inferring gender from title, and from name
+        // but given the export doesn't contain gender data ... I have no choice
+        if (undefined !== this.gender) {
+            return this.gender;
+        } else {
+            let genderConfig: GenderConfig = require('../config/genders.json');
+            let lctitle = this.title.toLowerCase();
+            let lcname = this.firstName.toLowerCase();
+            if (Object.keys(genderConfig.titles).includes(lctitle)) {
+                return (genderConfig.titles[lctitle]);
+            } else if (Object.keys(genderConfig.names).includes(lcname)) {
+                return (genderConfig.names[lcname]);
+            } else {
+                return Gender.male; // Hedge our bets.
+            }
+        }
+    }
+
+    getAgeAtStartOfSeason(season?: string): number | undefined {
+        if (undefined !== this.ageAtStartOfSeason && undefined === season) {
+            return this.ageAtStartOfSeason
+        } else if (undefined !== this.DOB) {
+            if (undefined == season) { // Default to current season
+                let now = new Date();
+                season = (now.getMonth() <= 6) ? String(now.getFullYear()) : String(now.getFullYear() - 1);
+            }
+            let startDate = new Date(season + '-08-31');
+            let age = startDate.getFullYear() - this.DOB.getFullYear();
+            const m = startDate.getMonth() - this.DOB.getMonth();
+            if (m < 0 || (m === 0 && startDate.getDate() < this.DOB.getDate())) { age-- };
+            return age;
+        } else {
+            return undefined;
+        }
+    }
+
+    getAgeGrade(config?: AgeGradeConfig): AgeGrade | undefined {
+        config = (undefined === config) ? DEFAULT_AGE_GRADE_CONFIG : config;
+        let agegrade: AgeGrade | undefined = undefined;
+        let ageAtStartOfSeason = this.getAgeAtStartOfSeason();
+        if (undefined !== ageAtStartOfSeason) {
+            for (let configitem of config) {
+                if (ageAtStartOfSeason >= configitem.minage
+                    && (undefined === configitem.maxage || ageAtStartOfSeason <= configitem.maxage)
+                    && (undefined === configitem.gender || this.getInferredGender() === configitem.gender)
+                ) {
+                    agegrade = configitem.agegrade;
+                    break;
+                }
+            }
+        }
+        return agegrade;
     }
 
 }
