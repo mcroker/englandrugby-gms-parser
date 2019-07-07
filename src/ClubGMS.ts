@@ -8,6 +8,7 @@ import { Role } from './Role';
 import { Qualifcation, QualificationType } from './Qualification';
 import { Scheme, SchemeNormaliseFunction } from './Scheme';
 import { AgeGrade } from './Team';
+import { ClubConfig, DEFAULT_CONFIG } from './ClubConfig';
 
 export class ClubGMS {
 
@@ -15,8 +16,11 @@ export class ClubGMS {
   memberships: Membership[] = [];
   families: Family[] = [];
   schemes: Map<string, Scheme> = new Map<string, Scheme>();
+  config: ClubConfig;
 
-  public constructor(peopleData?: Person[], membershipData?: Membership[]) {
+  public constructor(peopleData?: Person[], membershipData?: Membership[], config?: ClubConfig) {
+
+    this.config = (undefined !== config ) ? config : DEFAULT_CONFIG;
 
     // Stage 1 - Load people data
     if (undefined !== peopleData) {
@@ -62,16 +66,15 @@ export class ClubGMS {
       };
     });
 
-
   }
 
-  public static createFromGMSExports(peopleFile?: string, memberFile?: string): Promise<ClubGMS> {
+  public static createFromGMSExports(peopleFile?: string, memberFile?: string, config?: ClubConfig): Promise<ClubGMS> {
     return new Promise<ClubGMS>((resolve, reject) => {
       let peoplePromise = (undefined !== peopleFile) ? ClubGMS.readPeopleGMSFile(peopleFile) : Promise.resolve([] as Person[]);
       let memberPromise = (undefined !== memberFile) ? ClubGMS.readMembershipGMSFile(memberFile) : Promise.resolve([] as Membership[]);
       Promise.all([peoplePromise, memberPromise])
         .then((data: any[]) => {
-          resolve(new ClubGMS(data[0] as Person[], data[1] as Membership[]));
+          resolve(new ClubGMS(data[0] as Person[], data[1] as Membership[], config));
         })
         .catch((err: Error) => {
           reject(err);
@@ -117,7 +120,7 @@ export class ClubGMS {
 
   findPeopleByAgeGrade(agegrade: AgeGrade): Person[] {
     return Array.from(this.people.values()).filter((person: Person) => {
-      return (person.getAgeGrade() === agegrade)
+      return (person.getAgeGrade(this.config) === agegrade)
     })
   }
 

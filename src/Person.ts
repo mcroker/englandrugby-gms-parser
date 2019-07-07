@@ -5,24 +5,13 @@ export enum Gender {
     female = 'F'
 };
 
-export interface GenderConfig {
-    titles: { [title: string]: Gender; },
-    names: { [name: string]: Gender; }
-};
-
-export interface SeasonConfig {
-    [season: string]: {
-        start: Date,
-        end: Date
-    };
-};
-
 import { Address } from './Address';
 import { Relationship, RelationshipType as RelType } from './Relationship';
 import { Utils } from './Utils';
 import { Qualifcation, QualificationType } from './Qualification';
 import { Role } from './Role';
-import { AgeGrade, AgeGradeConfig, DEFAULT_AGE_GRADE_CONFIG } from './Team';
+import { GenderConfig, ClubConfig, DEFAULT_CONFIG, DEFAULT_GENDER_CONFIG } from './ClubConfig';
+import { AgeGrade } from './Team';
 
 export const P_TITLE = 'Title';
 export const P_RFUID = 'RFU ID';
@@ -324,18 +313,18 @@ export class Person {
         return firstname + ' ' + this.lastName + ' (' + this.rfuid + ')';
     }
 
-    getInferredGender(): Gender {
+    getInferredGender(genderConfig?: GenderConfig): Gender {
         // The PC person in me dislikes both inferring gender from title, and from name
         // but given the export doesn't contain gender data ... I have no choice
         if (undefined !== this.gender) {
             return this.gender;
         } else {
-            let genderConfig: GenderConfig = require('../config/genders.json');
+            genderConfig = (undefined === genderConfig) ? DEFAULT_GENDER_CONFIG : genderConfig;
             let lctitle = this.title.toLowerCase();
             let lcname = this.firstName.toLowerCase();
-            if (Object.keys(genderConfig.titles).includes(lctitle)) {
+            if (undefined !== genderConfig && undefined !== genderConfig.titles && Object.keys(genderConfig.titles).includes(lctitle)) {
                 return (genderConfig.titles[lctitle]);
-            } else if (Object.keys(genderConfig.names).includes(lcname)) {
+            } else if (undefined !== genderConfig && undefined !== genderConfig.names && Object.keys(genderConfig.names).includes(lcname)) {
                 return (genderConfig.names[lcname]);
             } else {
                 return Gender.male; // Hedge our bets.
@@ -361,15 +350,15 @@ export class Person {
         }
     }
 
-    getAgeGrade(config?: AgeGradeConfig): AgeGrade | undefined {
-        config = (undefined === config) ? DEFAULT_AGE_GRADE_CONFIG : config;
+    getAgeGrade(config?: ClubConfig): AgeGrade | undefined {
+        config = (undefined === config) ? DEFAULT_CONFIG : config;
         let agegrade: AgeGrade | undefined = undefined;
         let ageAtStartOfSeason = this.getAgeAtStartOfSeason();
         if (undefined !== ageAtStartOfSeason) {
-            for (let configitem of config) {
+            for (let configitem of config.agegroup) {
                 if (ageAtStartOfSeason >= configitem.minage
                     && (undefined === configitem.maxage || ageAtStartOfSeason <= configitem.maxage)
-                    && (undefined === configitem.gender || this.getInferredGender() === configitem.gender)
+                    && (undefined === configitem.gender || this.getInferredGender(config.gender) === configitem.gender)
                 ) {
                     agegrade = configitem.agegrade;
                     break;

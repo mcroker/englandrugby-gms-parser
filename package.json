@@ -8,9 +8,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "files": [
-    "config/**"
-  ],
   "author": "Martin Croker",
   "license": "ISC",
   "dependencies": {
