@@ -91,7 +91,7 @@ export class Person {
     email: string = '';
     balance: number | undefined = undefined; // Shouldn't be NaN - 0
     source: string = '';
-    isMember: boolean | undefined = undefined;
+    isMember: boolean = false;
     contact: string = ''; // TODO boolean?
     isPlayer: boolean | undefined = undefined;
     playerType: string = '';
@@ -276,7 +276,8 @@ export class Person {
     }
 
     isChild(): boolean {
-        return (undefined !== this.ageAtStartOfSeason && this.ageAtStartOfSeason <= 18);
+        let ageAtStartOfSeason = this.getAgeAtStartOfSeason();
+        return (undefined !== ageAtStartOfSeason && ageAtStartOfSeason < 18);
     }
 
     belongsToScheme(scheme: RegExp | string, requireActive = true): boolean {
@@ -332,25 +333,32 @@ export class Person {
         }
     }
 
-    getAgeAtStartOfSeason(season?: string): number | undefined {
-        if (undefined !== this.ageAtStartOfSeason && undefined === season) {
-            return this.ageAtStartOfSeason
-        } else if (undefined !== this.DOB) {
-            if (undefined == season) { // Default to current season
-                let now = new Date();
-                season = (now.getMonth() <= 6) ? String(now.getFullYear()) : String(now.getFullYear() - 1);
-            }
-            let startDate = new Date(season + '-08-31');
-            let age = startDate.getFullYear() - this.DOB.getFullYear();
-            const m = startDate.getMonth() - this.DOB.getMonth();
-            if (m < 0 || (m === 0 && startDate.getDate() < this.DOB.getDate())) { age-- };
+    getAgeOnDate(onDate?: Date): number | undefined {
+        onDate = (undefined !== onDate) ? onDate : new Date();
+        if (undefined !== this.DOB) {
+            let age = onDate.getFullYear() - this.DOB.getFullYear();
+            const m = onDate.getMonth() - this.DOB.getMonth();
+            if (m < 0 || (m === 0 && onDate.getDate() < this.DOB.getDate())) { age-- };
             return age;
         } else {
             return undefined;
         }
     }
 
-    getAgeGrade(config?: ClubConfig): AgeGrade | undefined {
+    getAgeAtStartOfSeason(season?: string): number | undefined {
+        if (undefined !== this.ageAtStartOfSeason && undefined === season) {
+            return this.ageAtStartOfSeason
+        } else {
+            if (undefined == season) { // Default to current season
+                let now = new Date();
+                season = (now.getMonth() <= 6) ? String(now.getFullYear()) : String(now.getFullYear() - 1);
+            }
+            let startDate = new Date(season + '-08-31');
+            return this.getAgeOnDate(startDate)
+        }
+    }
+
+    getAgeGrade(onlyRegisteredPlayers: boolean = true, config?: ClubConfig): AgeGrade | undefined {
         config = (undefined === config) ? DEFAULT_CONFIG : config;
         let agegrade: AgeGrade | undefined = undefined;
         let ageAtStartOfSeason = this.getAgeAtStartOfSeason();
@@ -359,6 +367,7 @@ export class Person {
                 if (ageAtStartOfSeason >= configitem.minage
                     && (undefined === configitem.maxage || ageAtStartOfSeason <= configitem.maxage)
                     && (undefined === configitem.gender || this.getInferredGender(config.gender) === configitem.gender)
+                    && (!onlyRegisteredPlayers || this.isPlayer)
                 ) {
                     agegrade = configitem.agegrade;
                     break;

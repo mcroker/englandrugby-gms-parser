@@ -9,6 +9,7 @@ import { Qualifcation, QualificationType } from './Qualification';
 import { Scheme, SchemeNormaliseFunction } from './Scheme';
 import { AgeGrade } from './Team';
 import { ClubConfig, DEFAULT_CONFIG } from './ClubConfig';
+import { Utils } from './Utils';
 
 export class ClubGMS {
 
@@ -20,7 +21,7 @@ export class ClubGMS {
 
   public constructor(peopleData?: Person[], membershipData?: Membership[], config?: ClubConfig) {
 
-    this.config = (undefined !== config ) ? config : DEFAULT_CONFIG;
+    this.config = (undefined !== config) ? config : DEFAULT_CONFIG;
 
     // Stage 1 - Load people data
     if (undefined !== peopleData) {
@@ -66,6 +67,31 @@ export class ClubGMS {
       };
     });
 
+  }
+
+  public static createFromDirectory(dirname?: string, config?: ClubConfig): Promise<ClubGMS> {
+    return new Promise<ClubGMS>((resolve, reject) => {
+      if (undefined === dirname) {
+         dirname = (undefined !== process.env.HOME) ? process.env.HOME + '/Downloads' : '.'
+      }
+      let findpeople = Utils.findLatestGlob(dirname + '/Individual_Everyone_*.csv');
+      let findmembers = Utils.findLatestGlob(dirname + '/Individual_MembersList_*.csv');
+      Promise.all([findpeople, findmembers])
+        .then((results) => {
+          let peopleFile = results[0];
+          let membersFile = results[1];
+          ClubGMS.createFromGMSExports(peopleFile, membersFile, config)
+            .then((club: ClubGMS) => {
+              resolve(club);
+            })
+            .catch((err: Error) => {
+              reject(err);
+            });
+        })
+        .catch((err: Error) => {
+          return Promise.reject(err);
+        })
+    })
   }
 
   public static createFromGMSExports(peopleFile?: string, memberFile?: string, config?: ClubConfig): Promise<ClubGMS> {
@@ -118,9 +144,9 @@ export class ClubGMS {
     return Array.from(this.people.values());
   }
 
-  findPeopleByAgeGrade(agegrade: AgeGrade): Person[] {
+  findPeopleByAgeGrade(agegrade: AgeGrade, onlyRegisteredPlayers: boolean = true): Person[] {
     return Array.from(this.people.values()).filter((person: Person) => {
-      return (person.getAgeGrade(this.config) === agegrade)
+      return (person.getAgeGrade(onlyRegisteredPlayers, this.config) === agegrade)
     })
   }
 
