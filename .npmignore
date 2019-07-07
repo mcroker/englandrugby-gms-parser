@@ -17,6 +17,7 @@ tslint.json
 *.tmp.txt
 .offline.pid
 .scannerwork
+temp
 
 # Reports
 reports/

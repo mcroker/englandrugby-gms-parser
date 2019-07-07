@@ -1,3 +1,9 @@
+/**
+ * A library for parsing England Rugby GMS Data extras.
+ *
+ * @packageDocumentation
+ * @beta
+ */
 export { Address } from './Address';
 export { ClubGMS } from './ClubGMS';
 export {
@@ -8,12 +14,7 @@ export {
     GenderTitleConfig,
     GenderConfig,
     ClubConfig,
-    DEFAULT_AGE_GRADE_CONFIG,
-    DEFAULT_SEASON_CONFIG,
-    DEFAULT_GENDER_NAME_CONFIG,
-    DEFAULT_GENDER_TITLE_CONFIG,
-    DEFAULT_GENDER_CONFIG,
-    DEFAULT_CONFIG
+    DefaultClubConfig
 } from './ClubConfig';
 export { Family, PrimaryData, MembershipScoreFunction } from './Family';
 export { Membership, MembershipCSVData } from './Membership';

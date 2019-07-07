@@ -1,13 +1,29 @@
 import { Person } from './Person';
 import { Membership } from './Membership';
 
+/**
+ * Function to help identify the primary person.  A function which implments 
+ * MembershipScoreFunction returns a numeric score for each person.  The entry which gets
+ * the highest score is deemed the primary member.
+ * @beta
+ */
 export type MembershipScoreFunction = (per: Person, mem: Membership) => number;
 
+/**
+ * Type definition for the Primary data of a family.  In general the primary member/membership
+ * Is the lead adult who pays - but that's not easy to derrive so we do our best.
+ * @beta
+ */
 export interface PrimaryData {
     person?: Person;
     membership?: Membership;
 }
 
+/**
+ * Class for a family - where a family contains a related collection of children and parent
+ * People objects
+ * @beta
+ */
 export class Family {
 
     children: Person[] = [];

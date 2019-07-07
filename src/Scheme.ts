@@ -1,7 +1,15 @@
 import { Membership } from './Membership';
 
+/**
+ * Functions implemting this function can be used to normalise the name of a schema
+ * @beta
+ */
 export type SchemeNormaliseFunction = (scheme: string) => string;
 
+/**
+ * Scheme object. Once of these is created for each membershiPScheme in a club.
+ * @beta
+ */
 export class Scheme {
 
     name: string;

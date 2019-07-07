@@ -1,5 +1,13 @@
+/**
+ * Data structure holding csv data from person GMS csv export.
+ * @public
+ */
 export declare interface PersonCSVData { [name: string]: string; };
 
+/**
+ * Enumeration for M/F gender values
+ * @public
+ */
 export enum Gender {
     male = 'M',
     female = 'F'
@@ -10,7 +18,7 @@ import { Relationship, RelationshipType as RelType } from './Relationship';
 import { Utils } from './Utils';
 import { Qualifcation, QualificationType } from './Qualification';
 import { Role } from './Role';
-import { GenderConfig, ClubConfig, DEFAULT_CONFIG, DEFAULT_GENDER_CONFIG } from './ClubConfig';
+import { GenderConfig, ClubConfig, DefaultClubConfig } from './ClubConfig';
 import { AgeGrade } from './Team';
 
 export const P_TITLE = 'Title';
@@ -72,11 +80,20 @@ import {
     Membership
 } from './Membership'
 
+/**
+ * Enumberation for DBS record status'
+ * @todo I am sure this isn't complete.
+ * @beta
+ */
 export enum DBSStatus {
     Current = 'Current',
     Expired = 'Expired'
 }
 
+/**
+ * Primary object representing a person extracted from the file
+ * @beta
+ */
 export class Person {
 
     csvdata: PersonCSVData | undefined;
@@ -320,7 +337,7 @@ export class Person {
         if (undefined !== this.gender) {
             return this.gender;
         } else {
-            genderConfig = (undefined === genderConfig) ? DEFAULT_GENDER_CONFIG : genderConfig;
+            genderConfig = (undefined === genderConfig) ? new DefaultClubConfig().gender: genderConfig;
             let lctitle = this.title.toLowerCase();
             let lcname = this.firstName.toLowerCase();
             if (undefined !== genderConfig && undefined !== genderConfig.titles && Object.keys(genderConfig.titles).includes(lctitle)) {
@@ -359,7 +376,7 @@ export class Person {
     }
 
     getAgeGrade(onlyRegisteredPlayers: boolean = true, config?: ClubConfig): AgeGrade | undefined {
-        config = (undefined === config) ? DEFAULT_CONFIG : config;
+        config = (undefined === config) ? new DefaultClubConfig() : config;
         let agegrade: AgeGrade | undefined = undefined;
         let ageAtStartOfSeason = this.getAgeAtStartOfSeason();
         if (undefined !== ageAtStartOfSeason) {

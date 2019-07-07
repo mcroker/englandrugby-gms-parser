@@ -1,3 +1,7 @@
+/**
+ * Enumeration of QualifcationTypes
+ * @public
+ */
 export enum QualificationType {
     coaching = 'Coaching',
     welfare = 'Welfare',
@@ -16,6 +20,10 @@ enum NormalisedQualifcation {
     cmod = 'CMOD'
 }
 
+/**
+ * Qualifcation Class - one of these is created for each qualifcation somebody holds
+ * @beta
+ */
 export class Qualifcation {
     name: string = '';
     type: QualificationType = QualificationType.unknown;

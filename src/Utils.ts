@@ -1,6 +1,10 @@
 import * as glob from 'glob-promise';
 import * as fs from 'fs';
 
+/**
+ * Utilities class
+ * @internal
+ */
 export class Utils {
 
     public static dateFromUKString(dateString: string): Date | undefined {

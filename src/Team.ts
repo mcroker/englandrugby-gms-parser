@@ -1,3 +1,8 @@
+/**
+ * AgeGrade enum
+ * Not sure how this plays off against teams.
+ * @beta
+ */
 export enum AgeGrade {
     under6 = 'U6',
     under7 = 'U7',

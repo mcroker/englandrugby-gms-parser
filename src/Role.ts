@@ -1,5 +1,9 @@
 import { Utils } from './Utils';
 
+/**
+ * Role object. One of these is created for each role a person has.
+ * @beta
+ */
 export class Role {
     name: string = '';
     since: Date | undefined = undefined;

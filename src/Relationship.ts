@@ -1,5 +1,11 @@
 import { Person } from './Person';
 
+/**
+ * Enumeration for RelationshipTpyes...  generally these are based on the person
+ * i.e. persona.relationship.reltype = RelationshipType.parentOf if 
+ * persona is the parent of the person referenced in persona.relationship.relation
+ * @beta
+ */
 export enum RelationshipType {
     parentOf = 'Parent',
     siblingOf = 'Sibling',
@@ -17,6 +23,11 @@ export enum RelationshipType {
     unknown = 'Unknown'
 };
 
+/**
+ * Relationship object. One of these is created for each relationship a person has to 
+ * another person.
+ * @beta
+ */
 export class Relationship {
 
     public rfuid: string;

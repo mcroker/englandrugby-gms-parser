@@ -1,6 +1,10 @@
 import { Utils } from './Utils';
 import { Person } from './Person';
 
+/**
+ * A datastructure holding the membership csv data.
+ * @public
+ */
 export declare interface MembershipCSVData { [name: string]: string; };
 
 export const M_CLUB = 'Club';
@@ -42,6 +46,10 @@ export const M_DBSEXPIRY = 'DBS Expiry';
 export const M_AWARDNAME = 'Award Qualification Name';
 export const M_RELATIONSHIPS = 'Relationships';
 
+/**
+ * Membership class. One of these is created for each row in the membership csv file.
+ * @beta
+ */
 export class Membership {
 
     csvdata: MembershipCSVData;
