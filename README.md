@@ -16,7 +16,7 @@ Useage instructions may appear in time, in the meanwhile you can see how I am us
 
 Any contributions are very welcome, send a pull request.
 
-## Authors
+## Contributors
 
 Martin Croker (mcroker@gmail.com)
 
