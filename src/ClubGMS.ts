@@ -1,6 +1,3 @@
-import * as fs from 'fs';
-import * as csv from 'fast-csv';
-
 import { Membership } from './Membership';
 import { Person } from './Person';
 import { Family } from './Family';
@@ -9,7 +6,14 @@ import { Qualifcation, QualificationType } from './Qualification';
 import { Scheme, SchemeNormaliseFunction } from './Scheme';
 import { AgeGrade } from './Team';
 import { ClubConfig, DefaultClubConfig } from './ClubConfig';
+import { Order } from './Order';
 import { Utils } from './Utils';
+
+export interface ClubData {
+  people?: Person[],
+  membership?: Membership[],
+  orders?: Order[]
+}
 
 /**
  * Primary class for gms-parser package, loads and enbles access to all imported GMS csv data
@@ -34,18 +38,18 @@ export class ClubGMS {
    * @param membershipData - Array of membership objects
    * @param config         - ClubConfig object, allowing a number of default configuration items to be overwritten.
    */
-  public constructor(peopleData?: Person[], membershipData?: Membership[], config?: ClubConfig) {
+  public constructor(data: ClubData, config?: ClubConfig) {
 
     this.config = (undefined !== config) ? config : new DefaultClubConfig() as ClubConfig;
 
     // Stage 1 - Load people data
-    if (undefined !== peopleData) {
-      peopleData.map((person: Person) => this.people.set(person.rfuid, person));
+    if (undefined !== data.people) {
+      data.people.map((person: Person) => this.people.set(person.rfuid, person));
     }
 
     // Stage 2 - Load membership data
-    if (undefined !== membershipData) {
-      membershipData.forEach((membership: Membership) => {
+    if (undefined !== data.membership) {
+      data.membership.forEach((membership: Membership) => {
         let person: Person | undefined = this.people.get(membership.rfuid);
         if (undefined === person) {
           person = new Person();
@@ -81,6 +85,9 @@ export class ClubGMS {
         this.schemes.set(membership.scheme, scheme);
       };
     });
+
+    // Stage 6 - Load orders
+
 
   }
 
@@ -129,59 +136,18 @@ export class ClubGMS {
    */
   public static createFromGMSExports(peopleFile?: string, memberFile?: string, config?: ClubConfig): Promise<ClubGMS> {
     return new Promise<ClubGMS>((resolve, reject) => {
-      let peoplePromise = (undefined !== peopleFile) ? ClubGMS.readPeopleGMSFile(peopleFile) : Promise.resolve([] as Person[]);
-      let memberPromise = (undefined !== memberFile) ? ClubGMS.readMembershipGMSFile(memberFile) : Promise.resolve([] as Membership[]);
+      let peoplePromise = (undefined !== peopleFile) ? Person.readGMSFile(peopleFile) : Promise.resolve([] as Person[]);
+      let memberPromise = (undefined !== memberFile) ? Membership.readGMSFile(memberFile) : Promise.resolve([] as Membership[]);
       Promise.all([peoplePromise, memberPromise])
         .then((data: any[]) => {
-          resolve(new ClubGMS(data[0] as Person[], data[1] as Membership[], config));
+          resolve(new ClubGMS({
+            people: data[0] as Person[],
+            membership: data[1] as Membership[]
+          }, config));
         })
         .catch((err: Error) => {
           reject(err);
         });
-    })
-  }
-
-  /**
-   * Reads GMS People CSV export into People object structure
-   * 
-   * @param file - Filename of people CSV export
-   * 
-   * @returns Array of Person objects contained in CSV export
-   */
-  protected static readPeopleGMSFile(file: string): Promise<Person[]> {
-    return new Promise<Person[]>((resolve, reject) => {
-      let people: Person[] = [];
-      var peoplestream = fs.createReadStream(file);
-      csv
-        .fromStream(peoplestream, { headers: true })
-        .on("data", function (data) {
-          people.push(new Person(data));
-        })
-        .on("end", function () {
-          resolve(people)
-        })
-    })
-  }
-
-  /**
-   * Reads GMS Membership CSV export into Membership object structure
-   * 
-   * @param file - Filename of membership CSV export
-   * 
-   * @returns Array of Membership objects contained in CSV export
-   */
-  protected static readMembershipGMSFile(file: string): Promise<Membership[]> {
-    return new Promise<Membership[]>((resolve, reject) => {
-      let memberships: Membership[] = [];
-      var memberstream = fs.createReadStream(file);
-      csv
-        .fromStream(memberstream, { headers: true })
-        .on("data", function (data) {
-          memberships.push(new Membership(data));
-        })
-        .on("end", function () {
-          resolve(memberships)
-        })
     })
   }
 

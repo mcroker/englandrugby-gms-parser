@@ -83,7 +83,7 @@ export class DefaultClubConfig implements ClubConfig {
         { agegrade: AgeGrade.under16, minage: 15, maxage: 15, gender: Gender.male },
         { agegrade: AgeGrade.colts, minage: 16, maxage: 17, gender: Gender.male },
         { agegrade: AgeGrade.senior, minage: 18, gender: Gender.male },
-        { agegrade: AgeGrade.under13ladies, minage: 11, maxage: 13, gender: Gender.female },
+        { agegrade: AgeGrade.under13ladies, minage: 11, maxage: 12, gender: Gender.female },
         { agegrade: AgeGrade.under15ladies, minage: 13, maxage: 14, gender: Gender.female },
         { agegrade: AgeGrade.under18ladies, minage: 15, maxage: 17, gender: Gender.female },
         { agegrade: AgeGrade.ladies, minage: 18, gender: Gender.female },

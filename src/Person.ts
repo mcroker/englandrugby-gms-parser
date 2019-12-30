@@ -20,6 +20,8 @@ import { Qualifcation, QualificationType } from './Qualification';
 import { Role } from './Role';
 import { GenderConfig, ClubConfig, DefaultClubConfig } from './ClubConfig';
 import { AgeGrade } from './Team';
+import * as csv from 'fast-csv';
+import * as fs from 'fs';
 
 export const P_TITLE = 'Title';
 export const P_RFUID = 'RFU ID';
@@ -141,6 +143,27 @@ export class Person {
     gender: Gender | undefined = undefined;
 
     // TODO - getContactPhones()
+    /**
+     * Reads GMS People CSV export into People object structure
+     * 
+     * @param file - Filename of people CSV export
+     * 
+     * @returns Array of Person objects contained in CSV export
+     */
+    static readGMSFile(file: string): Promise<Person[]> {
+        return new Promise<Person[]>((resolve, reject) => {
+            let people: Person[] = [];
+            var peoplestream = fs.createReadStream(file);
+            csv
+                .fromStream(peoplestream, { headers: true })
+                .on("data", function (data) {
+                    people.push(new Person(data));
+                })
+                .on("end", function () {
+                    resolve(people)
+                })
+        })
+    }
 
     public constructor(data?: PersonCSVData) {
         if (undefined !== data) {
@@ -337,7 +360,7 @@ export class Person {
         if (undefined !== this.gender) {
             return this.gender;
         } else {
-            genderConfig = (undefined === genderConfig) ? new DefaultClubConfig().gender: genderConfig;
+            genderConfig = (undefined === genderConfig) ? new DefaultClubConfig().gender : genderConfig;
             let lctitle = this.title.toLowerCase();
             let lcname = this.firstName.toLowerCase();
             if (undefined !== genderConfig && undefined !== genderConfig.titles && Object.keys(genderConfig.titles).includes(lctitle)) {

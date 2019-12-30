@@ -15,11 +15,14 @@ export enum RelationshipType {
     guardianOf = 'Guardian',
     grandparentOf = 'Grandparent',
     otherOf = 'Other',
-    nextOfKinOf = 'Next',
+    nextOfKinOf = 'Next of Kin',
     wifeOf = 'Wife',
     husbandOf = 'Husband',
     partnerOf = 'Partner',
     fianceOf = 'Fiance',
+    emergencycontact = 'Emergency Contact',
+    contactsource = 'Contact Source',
+    businesscontact = 'Business Contact',
     unknown = 'Unknown'
 };
 
@@ -41,9 +44,9 @@ export class Relationship {
             if (relRFUIdMatch != null) {
                 this.rfuid = relRFUIdMatch[0].substring(1, relRFUIdMatch[0].length - 1);
             }
-            let relTypeMatch = relString.match(/^[^ ]*/g);
+            let relTypeMatch = relString.match(/^(.*) of/);
             if (null !== relTypeMatch) {
-                this.relType = Relationship.getRelationshipType(relTypeMatch[0]);
+                this.relType = Relationship.getRelationshipType(relTypeMatch[1]);
             }
         }
     }

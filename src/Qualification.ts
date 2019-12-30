@@ -80,6 +80,7 @@ export class Qualifcation {
             case 'Adult Level 2': // Guess this is coaching
             case 'UKCC Level 2: Coaching the 15-a-side game':
             case 'England Rugby Coaching Award (Level 2)':
+            case 'England Rugby Coaching Award':
             case 'RFU Coaching Award': // Guess this is level 2
             case 'UKCC Level 2: QBE Coaching the 15-a-side game':
                 this.type = QualificationType.coaching;
