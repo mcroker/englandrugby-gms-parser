@@ -52,7 +52,7 @@ export class Relationship {
     }
 
     static getRelationshipType(typeString: string): RelationshipType {
-        if (Object.values(RelationshipType).includes(typeString)) {
+        if (Object.values(RelationshipType).includes(typeString as any)) {
             return typeString as RelationshipType;
         } else {
             console.log('WARNING: RelationshipType ' + typeString + ' not recognised.');

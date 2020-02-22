@@ -4,12 +4,13 @@ import { Family } from './Family';
 import { Role } from './Role';
 import { Qualifcation, QualificationType } from './Qualification';
 import { Scheme, SchemeNormaliseFunction } from './Scheme';
-import { AgeGrade } from './Team';
+import { Team, TeamType } from './Team';
 import { ClubConfig, DefaultClubConfig } from './ClubConfig';
 import { Order } from './Order';
 import { Utils } from './Utils';
 
 export interface ClubData {
+  teams: Team[],
   people?: Person[],
   membership?: Membership[],
   orders?: Order[]
@@ -22,6 +23,7 @@ export interface ClubData {
 export class ClubGMS {
 
   people: Map<string, Person> = new Map<string, Person>();
+  teams: Map<string, Team> = new Map<string, Team>();
   memberships: Membership[] = [];
   families: Family[] = [];
   schemes: Map<string, Scheme> = new Map<string, Scheme>();
@@ -42,6 +44,9 @@ export class ClubGMS {
 
     this.config = (undefined !== config) ? config : new DefaultClubConfig() as ClubConfig;
 
+    // Stage 0 - Load teams
+    data.teams.map((team: Team) => this.teams.set(team.name, team));
+
     // Stage 1 - Load people data
     if (undefined !== data.people) {
       data.people.map((person: Person) => this.people.set(person.rfuid, person));
@@ -60,6 +65,16 @@ export class ClubGMS {
         this.memberships.push(membership);
       });
     }
+
+    // Stage 2b - Add players to team
+    this.teams.forEach((team) => {
+      this.people.forEach((person) => {
+        if (team.personMeetsCriteria(person)) {
+          team.addPlayer(person);
+          person.addToTeam(team);
+        }
+      });
+    });
 
     // Stage 3 - Create links between people based on relationship
     this.people.forEach((person) => {
@@ -107,11 +122,13 @@ export class ClubGMS {
       }
       let findpeople = Utils.findLatestGlob(dirname + '/Individual_Everyone_*.csv');
       let findmembers = Utils.findLatestGlob(dirname + '/Individual_MembersList_*.csv');
-      Promise.all([findpeople, findmembers])
+      let teams = Utils.findLatestGlob(dirname + '/Organisation_Team_*.csv');
+      Promise.all([findpeople, findmembers, teams])
         .then((results) => {
           let peopleFile = results[0];
           let membersFile = results[1];
-          ClubGMS.createFromGMSExports(peopleFile, membersFile, config)
+          let teamsFile = results[2];
+          ClubGMS.createFromGMSExports(peopleFile, membersFile, teamsFile, config)
             .then((club: ClubGMS) => {
               resolve(club);
             })
@@ -134,15 +151,17 @@ export class ClubGMS {
    * 
    * @returns Populated ClubGMS object
    */
-  public static createFromGMSExports(peopleFile?: string, memberFile?: string, config?: ClubConfig): Promise<ClubGMS> {
+  public static createFromGMSExports(peopleFile?: string, memberFile?: string, teamsFile?: string, config?: ClubConfig): Promise<ClubGMS> {
     return new Promise<ClubGMS>((resolve, reject) => {
       let peoplePromise = (undefined !== peopleFile) ? Person.readGMSFile(peopleFile) : Promise.resolve([] as Person[]);
       let memberPromise = (undefined !== memberFile) ? Membership.readGMSFile(memberFile) : Promise.resolve([] as Membership[]);
-      Promise.all([peoplePromise, memberPromise])
+      let teamsPromise = Team.readGMSFile(teamsFile);
+      Promise.all([peoplePromise, memberPromise, teamsPromise])
         .then((data: any[]) => {
           resolve(new ClubGMS({
             people: data[0] as Person[],
-            membership: data[1] as Membership[]
+            membership: data[1] as Membership[],
+            teams: data[2]
           }, config));
         })
         .catch((err: Error) => {
@@ -170,10 +189,29 @@ export class ClubGMS {
    * @returns array of People objects for people who match AgeGrade criteria
    *          If nobody was found an empty array is returned.
    */
-  findPeopleByAgeGrade(agegrade: AgeGrade, onlyRegisteredPlayers: boolean = true): Person[] {
-    return Array.from(this.people.values()).filter((person: Person) => {
-      return (person.getAgeGrade(onlyRegisteredPlayers, this.config) === agegrade)
+  findPeopleByTeamType(teamType: TeamType, onlyRegisteredPlayers: boolean = true): Person[] {
+    let people: Set<Person> = new Set<Person>();
+    Array.from(this.teams.values()).filter((team: Team) => (team.type == teamType)).forEach((team: Team) => {
+      team.getPlayers().forEach((person: Person) => {
+        if (!onlyRegisteredPlayers || person.isPlayer) {
+          people.add(person);
+        }
+      });
     })
+    return Array.from(people);
+  }
+
+  findPeopleByTeamName(teamName: string, onlyRegisteredPlayers: boolean = true): Person[] {
+    const team = this.teams.get(teamName);
+    if (undefined !== team) {
+      return team.getPlayers(onlyRegisteredPlayers);
+    } else {
+      return [];
+    }
+  }
+
+  getTeam(teamName: string): Team | undefined {
+    return this.teams.get(teamName);
   }
 
   /**
@@ -254,6 +292,16 @@ export class ClubGMS {
       return (undefined !== person.memberships.find((item: Membership) => {
         return (item.scheme.match(scheme) && (undefined === status || item.status === status))
       }))
+    })
+  }
+
+  findPeopleByAgeAtStartOfSeason(minAge: number, maxAge?: number) {
+    const maxAgeSafe = (undefined !== maxAge) ? maxAge : 999;
+    return Array.from(this.people.values()).filter((person: Person) => {
+      return (undefined !== person.ageAtStartOfSeason
+        && person.ageAtStartOfSeason >= minAge
+        && person.ageAtStartOfSeason <= maxAgeSafe
+      );
     })
   }
 

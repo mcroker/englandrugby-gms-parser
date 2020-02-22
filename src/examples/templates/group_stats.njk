@@ -1,0 +1,13 @@
+{{ title | fixedlength(30) }} People    Members   %Members  Regd      %Regd
+------------------------------------------------------------------------------------------
+{% set totalPeople = 0 -%}
+{% set totalMembers = 0 -%}
+{% set totalRegd = 0 -%}
+{% for row in rows -%}
+{{ row.name | fixedlength(30) }} {{ row.numPeople | fixedlength(10) }} {{ row.numActiveMembers | fixedlength(10) }} {{ row.pctActiveMembers | int | fixedlength(10) }} {{ row.numRegisteredMembers | fixedlength(10) }} {{ row.pctRegisteredMembers | int | fixedlength(10) }}
+{%   set totalPeople = totalPeople + row.numPeople -%}
+{%   set totalMembers = totalMembers + row.numActiveMembers -%}
+{%   set totalRegd = totalRegd + row.numRegisteredMembers -%}
+{% endfor -%}
+------------------------------------------------------------------------------------------
+{{ 'Totals' | fixedlength(30) }} {{ totalPeople | fixedlength(10) }} {{ totalMembers | fixedlength(10) }} {{ ((100*totalMembers)//totalPeople) | fixedlength(10) }} {{ totalRegd  | int | fixedlength(10) }} {{ ((100*totalRegd)//totalPeople) | fixedlength(10) }}

@@ -4,24 +4,17 @@
  * @packageDocumentation
  * @beta
  */
-export { Address } from './Address';
-export { ClubGMS } from './ClubGMS';
-export {
-    AgeGradeConfigItem,
-    AgeGradeConfig,
-    SeasonConfig,
-    GenderNameConfig,
-    GenderTitleConfig,
-    GenderConfig,
-    ClubConfig,
-    DefaultClubConfig
-} from './ClubConfig';
-export { Family, PrimaryData, MembershipScoreFunction } from './Family';
-export { Membership, MembershipCSVData } from './Membership';
-export { Person, Gender, PersonCSVData } from './Person';
-export { Qualifcation, QualificationType } from './Qualification';
-export { Relationship } from './Relationship';
-export { Role } from './Role';
-export { Scheme, SchemeNormaliseFunction } from './Scheme';
-export { AgeGrade } from './Team';
-export { Utils as ClubGMSUtils } from './Utils';
+export { Address } from './lib/Address';
+export { ClubGMS } from './lib/ClubGMS';
+export { PersonGroup } from './lib/PersonGroup';
+export { GroupStats } from './lib/Types';
+export { SeasonConfig, GenderNameConfig, GenderTitleConfig, GenderConfig, ClubConfig, DefaultClubConfig } from './lib/ClubConfig';
+export { Family, PrimaryData, MembershipScoreFunction } from './lib/Family';
+export { Membership, MembershipCSVData } from './lib/Membership';
+export { Person, Gender, PersonCSVData } from './lib/Person';
+export { Qualifcation, QualificationType } from './lib/Qualification';
+export { Relationship } from './lib/Relationship';
+export { Role } from './lib/Role';
+export { Scheme, SchemeNormaliseFunction } from './lib/Scheme';
+export { Team, TeamGender, TeamStatus, TeamType } from './lib/Team';
+export { Utils as ClubGMSUtils } from './lib/Utils';

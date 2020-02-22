@@ -1,0 +1,3 @@
+{% for person in club.findPeopleByAgeGrade(argv[3]) %}
+{{- person.getName() }}: {{ person.getContactEmails() }}
+{% endfor %} 

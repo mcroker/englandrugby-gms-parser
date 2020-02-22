@@ -8,7 +8,7 @@ If you do end up using this - I'd love to know about it, drop me a line at webma
 
 ## Usage 
 
-Useage instructions may appear in time, in the meanwhile you can see how I am using it at https://github.com/mcroker/twrfc-gms-scripts
+Useage instructions may appear in time, in the meanwhile you can see how I am using it in the examples directory
 
 ## Contributing
 

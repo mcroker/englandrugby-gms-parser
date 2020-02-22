@@ -85,7 +85,7 @@ export class Order {
     }
 
     static getOrderStatus(statusString: string): OrderStatus {
-        if (Object.values(OrderStatus).includes(statusString)) {
+        if (Object.values(OrderStatus).includes(statusString as any)) {
             return statusString as OrderStatus;
         } else {
             console.log('WARNING: Order Status ' + statusString + ' not recognised.');
@@ -94,7 +94,7 @@ export class Order {
     }
 
     static getPaymentMethod(methodString: string): PaymentMethod {
-        if (Object.values(PaymentMethod).includes(methodString)) {
+        if (Object.values(PaymentMethod).includes(methodString as any)) {
             return methodString as PaymentMethod;
         } else {
             console.log('WARNING: Payment Method ' + methodString + ' not recognised.');

@@ -13,15 +13,26 @@ export enum Gender {
     female = 'F'
 };
 
+export interface PersonGroup {
+    name: string;
+    numEligablePeople: number;
+    numActiveMembers: number;
+    pctActiveMembers: number;
+    numRegisteredMembers: number;
+    pctRegisteredMembers: number;
+};
+
 import { Address } from './Address';
 import { Relationship, RelationshipType as RelType } from './Relationship';
 import { Utils } from './Utils';
 import { Qualifcation, QualificationType } from './Qualification';
 import { Role } from './Role';
-import { GenderConfig, ClubConfig, DefaultClubConfig } from './ClubConfig';
-import { AgeGrade } from './Team';
+import { GenderConfig, DefaultClubConfig } from './ClubConfig';
+import { Team } from './Team';
 import * as csv from 'fast-csv';
 import * as fs from 'fs';
+import * as nodemailer from 'nodemailer';
+
 
 export const P_TITLE = 'Title';
 export const P_RFUID = 'RFU ID';
@@ -141,6 +152,7 @@ export class Person {
     occupation: string = '';
     memberships: Membership[] = [];
     gender: Gender | undefined = undefined;
+    teams: Team[] = [];
 
     // TODO - getContactPhones()
     /**
@@ -315,6 +327,10 @@ export class Person {
         this.memberships.push(membership);
     }
 
+    addToTeam(team: Team) {
+        this.teams.push(team);
+    }
+
     isChild(): boolean {
         let ageAtStartOfSeason = this.getAgeAtStartOfSeason();
         return (undefined !== ageAtStartOfSeason && ageAtStartOfSeason < 18);
@@ -355,7 +371,7 @@ export class Person {
     }
 
     getInferredGender(genderConfig?: GenderConfig): Gender {
-        // The PC person in me dislikes both inferring gender from title, and from name
+        // The incusivity in me dislikes both inferring gender from title, and from name
         // but given the export doesn't contain gender data ... I have no choice
         if (undefined !== this.gender) {
             return this.gender;
@@ -398,23 +414,45 @@ export class Person {
         }
     }
 
-    getAgeGrade(onlyRegisteredPlayers: boolean = true, config?: ClubConfig): AgeGrade | undefined {
-        config = (undefined === config) ? new DefaultClubConfig() : config;
-        let agegrade: AgeGrade | undefined = undefined;
-        let ageAtStartOfSeason = this.getAgeAtStartOfSeason();
-        if (undefined !== ageAtStartOfSeason) {
-            for (let configitem of config.agegroup) {
-                if (ageAtStartOfSeason >= configitem.minage
-                    && (undefined === configitem.maxage || ageAtStartOfSeason <= configitem.maxage)
-                    && (undefined === configitem.gender || this.getInferredGender(config.gender) === configitem.gender)
-                    && (!onlyRegisteredPlayers || this.isPlayer)
-                ) {
-                    agegrade = configitem.agegrade;
-                    break;
-                }
-            }
+    getTeams(onlyRegisteredPlayers: boolean = true): Team[] {
+        if (onlyRegisteredPlayers && !this.isPlayer) {
+            return [];
+        } else {
+            return this.teams;
         }
-        return agegrade;
+    }
+
+    getTeam(onlyRegisteredPlayers: boolean = true): Team | undefined {
+        const teams = this.getTeams(onlyRegisteredPlayers);
+        if (teams.length == 0) {
+            return undefined;
+        } else {
+            return teams[0];
+        }
+    }
+
+    sendEmail(transport: nodemailer.Transporter, mailOptions: nodemailer.SendMailOptions, copyCoach = true): Promise<any> {
+        if (Array.isArray(mailOptions.to)) {
+            mailOptions.to = mailOptions.to.concat(this.getContactEmails())
+        } else if ('string' == typeof mailOptions.to && mailOptions.to != '') {
+            let emails = this.getContactEmails();
+            emails.push(mailOptions.to);
+            mailOptions.to = emails.join(',');
+        } else {
+            mailOptions.to = this.getContactEmails();
+        }
+
+        return new Promise<any>((resolve, reject) => {
+            transport.sendMail(mailOptions, function (error: Error, info: any) {
+                if (error) {
+                    console.log(error);
+                    reject(error);
+                } else {
+                    console.log('Email sent: ' + info.response);
+                    resolve(info);
+                }
+            });
+        });
     }
 
 }
