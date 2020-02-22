@@ -1,0 +1,32 @@
+<H1>Membership Report {{ team.name }}<H1>
+
+<H2>Stats</H2>
+<TABLE>
+    <TR><TD>In GMS</TD><TD colspan=2>{{ team.numEligablePeople }}</TD></TR>
+    <TR></D>Members</TD><TD>{{ team.numActiveMembers }} </TD><TD>({{ team.pctActiveMembers | int }}%)</TD></TR>
+    <TR><TD>Registered</TD><TD>{{ team.numRegisteredMembers }}</TD><TD>({{ team.pctRegisteredMembers | int }}%)</TD></TR>
+</TABLE>
+
+<H2>Individuals</H2>
+<TABLE>
+    <THEAD>
+        <TD>RFU ID</TD>
+        <TD>DOB</TD>
+        <TD>Name</TD>
+        <TD>Member?</TD>
+        <TD>Registered?</TD>
+        <TD>Comments</TD>
+    </THEAD>
+    <TBODY>
+    {% for person in team.getPlayers(false) %}
+        <TR>
+            <TD>{{ person.rfuid }}</TD>
+            <TD>{{ person.DOB.toLocaleDateString(undefined, { dateStyle: 'short' } ) }}</TD>
+            <TD>{{ person.getName() }}</TD>
+            <TD>{{ person | ismember_html }}</TD>
+            <TD>{{ person | isplayer_html }}</TD>
+            <TD>{{ comments[person.rfuid] }}</TD>
+        </TR>
+    {% endfor %}
+    </TBODY>
+</TABLE>

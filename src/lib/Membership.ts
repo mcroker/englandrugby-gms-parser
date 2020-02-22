@@ -1,5 +1,7 @@
 import { Utils } from './Utils';
 import { Person } from './Person';
+import * as csv from 'fast-csv';
+import * as fs from 'fs';
 
 /**
  * A datastructure holding the membership csv data.
@@ -66,9 +68,32 @@ export class Membership {
     status: string = '';
     statusReason: string = '';
     renewalDate: Date | undefined = undefined;
-    updateDate: Date | undefined  = undefined;
+    updateDate: Date | undefined = undefined;
     updateBy: string = '';
     person: Person | undefined = undefined;
+
+
+    /**
+     * Reads GMS Membership CSV export into Membership object structure
+     * 
+     * @param file - Filename of membership CSV export
+     * 
+     * @returns Array of Membership objects contained in CSV export
+     */
+    static readGMSFile(file: string): Promise<Membership[]> {
+        return new Promise<Membership[]>((resolve, reject) => {
+            let memberships: Membership[] = [];
+            var memberstream = fs.createReadStream(file);
+            csv
+                .fromStream(memberstream, { headers: true })
+                .on("data", function (data) {
+                    memberships.push(new Membership(data));
+                })
+                .on("end", function () {
+                    resolve(memberships)
+                })
+        })
+    }
 
     public constructor(data?: MembershipCSVData) {
         if (undefined !== data) {

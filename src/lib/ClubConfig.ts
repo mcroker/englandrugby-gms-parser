@@ -1,4 +1,3 @@
-import { AgeGrade } from './Team';
 import { Gender } from './Person';
 
 /**
@@ -23,23 +22,6 @@ export interface GenderConfig {
 };
 
 /**
- * Configuration for age & gender to AgeGrade resolution
- * @beta
- */
-export interface AgeGradeConfigItem {
-    agegrade: AgeGrade,
-    minage: number,
-    maxage?: number,
-    gender?: Gender
-}
-
-/**
- * Configuration set for age & gender to AgeGrade resolution.
- * @beta
- */
-export type AgeGradeConfig = AgeGradeConfigItem[];
-
-/**
  * Configuration of RFU Seasons
  * @beta
  */
@@ -56,7 +38,6 @@ export interface SeasonConfig {
  */
 export interface ClubConfig {
     readonly gender: GenderConfig;
-    readonly agegroup: AgeGradeConfig;
     readonly seasons: SeasonConfig;
 }
 
@@ -65,29 +46,6 @@ export interface ClubConfig {
  * @beta
  */
 export class DefaultClubConfig implements ClubConfig {
-
-    /**
-     * Default AgrGrade Configuration
-     */
-    public readonly agegroup: AgeGradeConfig = [
-        { agegrade: AgeGrade.under6, minage: 4, maxage: 5 },
-        { agegrade: AgeGrade.under7, minage: 6, maxage: 6 },
-        { agegrade: AgeGrade.under8, minage: 7, maxage: 7 },
-        { agegrade: AgeGrade.under9, minage: 8, maxage: 8 },
-        { agegrade: AgeGrade.under10, minage: 9, maxage: 9 },
-        { agegrade: AgeGrade.under11, minage: 10, maxage: 10 },
-        { agegrade: AgeGrade.under12, minage: 11, maxage: 11, gender: Gender.male },
-        { agegrade: AgeGrade.under13, minage: 12, maxage: 12, gender: Gender.male },
-        { agegrade: AgeGrade.under14, minage: 13, maxage: 13, gender: Gender.male },
-        { agegrade: AgeGrade.under15, minage: 14, maxage: 14, gender: Gender.male },
-        { agegrade: AgeGrade.under16, minage: 15, maxage: 15, gender: Gender.male },
-        { agegrade: AgeGrade.colts, minage: 16, maxage: 17, gender: Gender.male },
-        { agegrade: AgeGrade.senior, minage: 18, gender: Gender.male },
-        { agegrade: AgeGrade.under13ladies, minage: 11, maxage: 13, gender: Gender.female },
-        { agegrade: AgeGrade.under15ladies, minage: 13, maxage: 14, gender: Gender.female },
-        { agegrade: AgeGrade.under18ladies, minage: 15, maxage: 17, gender: Gender.female },
-        { agegrade: AgeGrade.ladies, minage: 18, gender: Gender.female },
-    ]
 
     /**
      * Default title to gender inference configuration

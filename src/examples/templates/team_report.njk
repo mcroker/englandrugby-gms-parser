@@ -1,0 +1,12 @@
+## Membership Report : {{ team.name }}
+
+## Stats
+In GMS      {{ team.numEligablePeople }}
+Members     {{ team.numActiveMembers }} ({{ team.pctActiveMembers | int }}%)
+Registered  {{ team.numRegisteredMembers }} ({{ team.pctRegisteredMembers | int }}%)
+
+## Individuals
+RFU ID  DOB        Name                Member?        Registered?    Comments
+{% for person in team.getPlayers(false) -%}
+{{ person.rfuid | fixedlength(8) }} {{ person.DOB.toLocaleDateString(undefined, { dateStyle: 'short' } ) }} {{ person.getName() | fixedlength(20) }} {{ person | ismember | fixedlength(15) }} {{ person | isplayer | fixedlength (15) }} {{ comments[person.rfuid] | truncate(40) }}
+{% endfor %}
