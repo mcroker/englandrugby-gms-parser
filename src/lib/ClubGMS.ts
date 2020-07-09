@@ -69,8 +69,8 @@ export class ClubGMS {
     // Stage 2b - Add players to team
     this.teams.forEach((team) => {
       this.people.forEach((person) => {
-        if (team.personMeetsCriteria(person)) {
-          team.addPlayer(person);
+        if (team.personMeetsCriteria(person, false, false)) {
+          team.addPerson(person);
           person.addToTeam(team);
         }
       });
@@ -204,7 +204,7 @@ export class ClubGMS {
   findPeopleByTeamName(teamName: string, onlyRegisteredPlayers: boolean = true): Person[] {
     const team = this.teams.get(teamName);
     if (undefined !== team) {
-      return team.getPlayers(onlyRegisteredPlayers);
+      return team.getPeople();
     } else {
       return [];
     }

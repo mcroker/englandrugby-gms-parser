@@ -1,0 +1,23 @@
+{{ title | fixedlength(30) }} #Plr   #Coa   Ratio  xDBS!  RR     L2s    Refs   HCase
+------------------------------------------------------------------------------------------
+{% set totalPlayers = 0 -%}
+{% set totalCoaches = 0 -%}
+{% set totalCoachesNoDBS = 0 -%}
+{% set totalRR = 0 -%}
+{% set totalL2 = 0 -%}
+{% set totalRef = 0 -%}
+{% set totalHcase = 0 -%}
+{% set spc = 7 -%}
+{% for row in rows -%}
+{{ row.name | fixedlength(30) }} {{ row.numActiveMembers | fixedlength(spc) }} {{ row.numCoaches | fixedlength(spc) }} {{ row.coachRatio | round(1) | fixedlength(spc) }} {{ row.numCoachesNoDBS | fixedlength(spc) }} {{ row.numCoachesL0 | fixedlength(spc) }} {{ row.numCoachesL2 | fixedlength(spc) }} {{ row.numRefsL2 | fixedlength(spc) }} {{ row.numCoachesConcussion | fixedlength(spc) }}
+{%   set totalPlayers = totalPlayers + row.numActiveMembers -%}
+{%   set totalCoaches = totalCoaches + row.numCoaches -%}
+{%   set totalCoachesNoDBS = totalCoachesNoDBS + row.numCoachesNoDBS -%}
+{%   set totalRR = totalRR + row.numCoachesL0 -%}
+{%   set totalL2 = totalL2 + row.numCoachesL2 -%}
+{%   set totalRef = totalRef + row.numRefsL2 -%}
+{%   set totalHcase = totalHcase + row.numCoachesConcussion -%}
+{% endfor -%}
+------------------------------------------------------------------------------------------
+{% set totalRatio = totalPlayers / totalCoaches -%}
+{{ 'Totals' | fixedlength(30) }} {{ totalPlayers | fixedlength(spc) }} {{ totalCoaches | fixedlength(spc) }} {{ totalRatio | round(1) | fixedlength(spc)  }} {{ totalCoachesNoDBS | fixedlength(spc) }} {{ totalRR | fixedlength(spc) }} {{ totalL2 | fixedlength(spc) }} {{ totalRef | fixedlength(spc) }} {{ totalHcase | fixedlength(spc) }}

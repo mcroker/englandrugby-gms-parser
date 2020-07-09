@@ -1,32 +1,78 @@
-<H1>Membership Report {{ team.name }}<H1>
-
-<H2>Stats</H2>
-<TABLE>
-    <TR><TD>In GMS</TD><TD colspan=2>{{ team.numEligablePeople }}</TD></TR>
-    <TR></D>Members</TD><TD>{{ team.numActiveMembers }} </TD><TD>({{ team.pctActiveMembers | int }}%)</TD></TR>
-    <TR><TD>Registered</TD><TD>{{ team.numRegisteredMembers }}</TD><TD>({{ team.pctRegisteredMembers | int }}%)</TD></TR>
-</TABLE>
-
-<H2>Individuals</H2>
-<TABLE>
-    <THEAD>
-        <TD>RFU ID</TD>
-        <TD>DOB</TD>
-        <TD>Name</TD>
-        <TD>Member?</TD>
-        <TD>Registered?</TD>
-        <TD>Comments</TD>
-    </THEAD>
-    <TBODY>
-    {% for person in team.getPlayers(false) %}
-        <TR>
-            <TD>{{ person.rfuid }}</TD>
-            <TD>{{ person.DOB.toLocaleDateString(undefined, { dateStyle: 'short' } ) }}</TD>
-            <TD>{{ person.getName() }}</TD>
-            <TD>{{ person | ismember_html }}</TD>
-            <TD>{{ person | isplayer_html }}</TD>
-            <TD>{{ comments[person.rfuid] }}</TD>
-        </TR>
+<html>
+  <head>
+    <style>
+      THEAD TR {
+        font-weight: bold;
+        color: blue;
+      }
+      .cen {
+        text-align: center; 
+      }
+    </style>
+  </head>
+  <body>
+    <H1>Membership Report {{ team.name }}<H1>
+    
+    <H2>Stats</H2>
+    <TABLE>
+        <TR></D>Members</TD><TD>{{ team.numActiveMembers }} </TD></TR>
+        <TR><TD>Registered</TD><TD>{{ team.numRegisteredMembers }}</TD></TR>
+    </TABLE>
+    
+    <H2>Individuals</H2>
+    <TABLE>
+        <THEAD>
+            <TD>RFU ID</TD>
+            <TD>DOB</TD>
+            <TD>Name</TD>
+            <TD>Member?</TD>
+            <TD>Registered?</TD>
+            <TD>Comments</TD>
+        </THEAD>
+        <TBODY>
+        {% for person in team.getPlayers(false) %}
+            <TR>
+                <TD>{{ person.rfuid }}</TD>
+                <TD>{{ person.DOB.toLocaleDateString(undefined, { dateStyle: 'short' } ) }}</TD>
+                <TD>{{ person.getName() }}</TD>
+                <TD class="cen">{{ person | ismember_html }}</TD>
+                <TD class="cen">{{ person | isplayer_html }}</TD>
+                <TD class="cen">{{ comments[person.rfuid] }}</TD>
+            </TR>
+        {% endfor %}
+        </TBODY>
+    </TABLE>
+    
+    <H2>Coaches</H2>
+    <TABLE>
+        <THEAD>
+            <TD>RFU ID</TD>
+            <TD>DOB</TD>
+            <TD>Name</TD>
+            <TD>DBS</TD>
+            <TD>Expiry</TD>
+            <TD class="cen">Rugby Ready</TD>
+            <TD class="cen">Coaching</TD>
+            <TD class="cen">Refereeing</TD>
+        </THEAD>
+        <TBODY>
+    {% for person in team.getCoaches() -%}
+            <TR>
+      {% if (undefined !==  person.DBSExpiryDate) -%}
+      {% set expDate = person.DBSExpiryDate.toLocaleDateString(undefined, { dateStyle: 'short' } ) -%}
+      {% else -%}
+      {% set expDate = '' -%}
+      {% endif -%}
+         <TD>{{ person.rfuid}}</TD>
+         <TD>{{ person.DOB.toLocaleDateString(undefined, { dateStyle: 'short' } ) }}</TD>
+         <TD>{{ person.getName() }}</TD>
+         <TD>{{ person.DBSStatus | dbs_html }}</TD>
+         <TD> {{ expDate }}</TD>
+         <TD class="cen">{{ person.hasQualifcationType('Coaching') | yesblank }}</TD>
+         <TD class="cen">{{ person.levelQualificationType('Coaching', 1) }}</TD>
+         <TD class="cen"> {{ person.levelQualificationType('Refereeing', 1) }}</TD>
     {% endfor %}
-    </TBODY>
-</TABLE>
+        </TBODY>
+    </TABLE>
+  </body>
+</html>

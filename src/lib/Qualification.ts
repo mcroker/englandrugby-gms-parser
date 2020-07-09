@@ -17,6 +17,7 @@ enum NormalisedQualifcation {
     concussion = 'Concussion Module',
     rugbyready = 'Rugby Ready',
     cpd = 'CPD',
+    elearning = 'Elearning',
     cmod = 'CMOD'
 }
 
@@ -27,17 +28,22 @@ enum NormalisedQualifcation {
 export class Qualifcation {
     name: string = '';
     type: QualificationType = QualificationType.unknown;
-    level: number  = -1;
+    level: number = -1;
 
     constructor(name: string) {
         this.name = String(name).trim();
         let normalisedName = this.name;
 
         if (this.name.match(/^CPD /) || this.name.match(/ CPD /)) normalisedName = NormalisedQualifcation.cpd;
+        if (this.name.match(/E-Learning/)) normalisedName = NormalisedQualifcation.elearning;
         if (this.name.match(/^CMOD /) || this.name.match(/^Continuous Referee Development/)) normalisedName = NormalisedQualifcation.cmod;
-        if (this.name.match(/^Concussion Module/)) normalisedName = NormalisedQualifcation.concussion;
+        if (this.name.match(/^Concussion/)) normalisedName = NormalisedQualifcation.concussion;
 
         switch (normalisedName) {
+
+            case NormalisedQualifcation.elearning:
+            case 'World Rugby Online Course':
+                this.type = QualificationType.unknown;
 
             // Medical
             case NormalisedQualifcation.concussion:
@@ -45,6 +51,7 @@ export class Qualifcation {
                 this.level = 0;
                 break;;
             case 'Emergency First Aid in Rugby Union':
+            case 'Emergency First Aid at Work':
             case 'Appointed Person (First Aid)':
                 this.type = QualificationType.medical;
                 this.level = 1;
@@ -83,6 +90,8 @@ export class Qualifcation {
             case 'England Rugby Coaching Award':
             case 'RFU Coaching Award': // Guess this is level 2
             case 'UKCC Level 2: QBE Coaching the 15-a-side game':
+            case 'Refereeing the 15-a-side game':
+            case 'England Rugby Referee Award':
                 this.type = QualificationType.coaching;
                 this.level = 2;
                 break;;

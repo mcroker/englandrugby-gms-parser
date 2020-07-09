@@ -54,7 +54,7 @@ export class TWRFCUtils {
 
     env.addFilter('fixedlength', function (input: string | number, length: number) {
       const padding = '                                                                                                                                                                                                                                                                ';
-      const padded: string = input + padding;
+      const padded: string = (input) ? input + padding : padding;
       return padded.substr(0, length - 1);
     });
 
@@ -99,6 +99,24 @@ export class TWRFCUtils {
         return 'Yes'
       } else {
         return 'No'
+      }
+    });
+
+    env.addFilter('yesblank', function (b: string) {
+      if (b) {
+        return 'Yes'
+      } else {
+        return ''
+      }
+    });
+
+    env.addFilter('dbs_html', function (b?: string) {
+      if (b === 'Current') {
+        return b
+      } else if (b !== '') {
+        return '<span style="color:red">' + b + '</span>'
+      } else {
+        return '<span style="color:red">None</span>'
       }
     });
 

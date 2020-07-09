@@ -10,3 +10,15 @@ RFU ID  DOB        Name                Member?        Registered?    Comments
 {% for person in team.getPlayers(false) -%}
 {{ person.rfuid | fixedlength(8) }} {{ person.DOB.toLocaleDateString(undefined, { dateStyle: 'short' } ) }} {{ person.getName() | fixedlength(20) }} {{ person | ismember | fixedlength(15) }} {{ person | isplayer | fixedlength (15) }} {{ comments[person.rfuid] | truncate(40) }}
 {% endfor %}
+
+## coaches
+RFU ID  DOB        Name                DBS      Expiry     RReady    Coaching  Refereeing
+-----------------------------------------------------------------------------------------
+{% for person in team.getCoaches() -%}
+  {% if (undefined !==  person.DBSExpiryDate) -%}
+  {% set expDate = person.DBSExpiryDate.toLocaleDateString(undefined, { dateStyle: 'short' } ) -%}
+  {% else -%}
+  {% set expDate = '' -%}
+  {% endif -%}
+{{ person.rfuid | fixedlength(8) }} {{ person.DOB.toLocaleDateString(undefined, { dateStyle: 'short' } ) }} {{ person.getName() | fixedlength(20) }} {{ person.DBSStatus | fixedlength(9) }} {{ expDate | fixedlength(11) }} {{ person.hasQualifcationType('Coaching') | fixedlength(10) }} {{ person.levelQualificationType('Coaching', 1) | fixedlength(10) }} {{ person.levelQualificationType('Refereeing', 1) | fixedlength(10) }}
+{% endfor %}

@@ -66,6 +66,7 @@ export const P_DPAFLAG2 = 'DPAFlag2';
 export const P_INTERESTS = 'Interests';
 export const P_CUSTOMTAG = 'Custom Tag';
 export const P_DATEASSOCIATED = 'Date Associated to Club';
+export const P_TEAMS = 'Team';
 
 import {
     M_RFUID,
@@ -152,6 +153,7 @@ export class Person {
     occupation: string = '';
     memberships: Membership[] = [];
     gender: Gender | undefined = undefined;
+    teamsString: string = '';
     teams: Team[] = [];
 
     // TODO - getContactPhones()
@@ -266,6 +268,7 @@ export class Person {
         if (undefined !== data[P_INTERESTS]) this.interests = data[P_INTERESTS];
         if (undefined !== data[P_CUSTOMTAG]) this.customTag = data[P_CUSTOMTAG];
         if (undefined !== data[P_DATEASSOCIATED]) this.dataAssocated = Utils.dateFromUKString(data[P_DATEASSOCIATED]);
+        if (undefined !== data[P_TEAMS]) this.teamsString = data[P_TEAMS];
     }
 
     protected setRelationships(text: string) {
@@ -358,6 +361,16 @@ export class Person {
         return (undefined !== this.qualifcations.find((item: Qualifcation) => {
             return (item.type === qualifcationType && item.level >= minLevel);
         }));
+    }
+
+    levelQualificationType(qualifcationType: QualificationType, minLevel = -1): number | undefined {
+        const matching = this.qualifcations.filter((item: Qualifcation) => (item.type === qualifcationType && item.level >= minLevel));
+        if (matching.length > 0) {
+            const levels = matching.map((item: Qualifcation) => item.level);
+            return Math.max(...levels);
+        } else {
+            return undefined;
+        }
     }
 
     getName(): string {

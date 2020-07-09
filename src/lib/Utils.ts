@@ -26,6 +26,7 @@ export class Utils {
     }
 
     public static findLatestGlob(globPattern: string): Promise<string> {
+        console.log(globPattern);
         return new Promise<string>((resolve, reject) => {
             glob.promise(globPattern)
                 .then((files: string[]) => {

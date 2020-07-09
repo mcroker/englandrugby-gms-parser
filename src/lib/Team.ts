@@ -188,12 +188,13 @@ export class Team extends PersonGroup {
         }
     }
 
-    personMeetsCriteria(person: Person, onlyRegisteredPlayers: boolean = false): boolean {
+    personMeetsCriteria(person: Person, onlyRegisteredPlayers: boolean = false, meetsAgeOnly = true): boolean {
         const oldEough: boolean = (undefined === person.ageAtStartOfSeason || person.ageAtStartOfSeason >= this.minage);
         const youngEnough: boolean = (undefined === person.ageAtStartOfSeason || person.ageAtStartOfSeason <= this.maxage);
         const meetsGender: boolean = (undefined === this.gender || this.meetsGenderCriteria(person.getInferredGender()));
         const meetsRegistation: boolean = (!onlyRegisteredPlayers || (undefined !== person.isPlayer && person.isPlayer));
-        return (oldEough && youngEnough && meetsGender && meetsRegistation);
+        const isAssociated: boolean = new RegExp(this.name + '(,|$)').test(person.teamsString);
+        return (((isAssociated && !meetsAgeOnly) || (oldEough && youngEnough && meetsGender)) && meetsRegistation);
     }
 
 }

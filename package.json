@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "repository": "git@github.com:mcroker/englandrugby-gms-parser.git",
   "scripts": {
-    "build": "tsc; cp -R src/examples/templates dist/examples/templates",
+    "build": "tsc; cp -R src/examples/templates dist/examples",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Martin Croker",
