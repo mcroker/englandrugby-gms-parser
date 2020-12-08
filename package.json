@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@microsoft/api-extractor": "^7.2.2",
-    "fast-csv": "^2.4.1",
+    "fast-csv": "^4.3.6",
     "fs": "0.0.1-security",
     "glob": "^7.1.4",
     "glob-promise": "^3.4.0",
