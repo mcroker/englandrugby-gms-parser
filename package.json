@@ -19,7 +19,7 @@
     "glob-promise": "^3.4.0",
     "nodemailer": "^6.4.2",
     "nunjucks": "^3.2.0",
-    "printf": "^0.5.2"
+    "printf": "^0.6.1"
   },
   "devDependencies": {
     "@types/node": "^12.12.24",
